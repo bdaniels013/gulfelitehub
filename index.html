@@ -45,6 +45,7 @@
             background-image: url('https://via.placeholder.com/1920x1080?text=Luxury+Coastal+Sunset');
             background-size: cover;
             background-position: center;
+            background-attachment: fixed;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -59,26 +60,45 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.8));
+            background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.6));
         }
         #hero h1 {
             font-size: 4rem;
             z-index: 1;
             margin-bottom: 20px;
+            animation: fadeIn 2s ease-in;
         }
         #hero p {
             font-size: 1.2rem;
             max-width: 800px;
             z-index: 1;
+            animation: fadeIn 2s ease-in 0.5s forwards;
+            opacity: 0;
+        }
+        @media (max-width: 768px) {
+            #hero h1 {
+                font-size: 3rem;
+            }
+            #hero p {
+                font-size: 1rem;
+                padding: 0 20px;
+            }
         }
         /* Navigation */
         nav {
             position: sticky;
             top: 0;
-            background-color: rgba(0,0,0,0.9);
+            background-color: transparent;
             z-index: 1000;
-            padding: 10px 0;
+            padding: 0;
             text-align: center;
+            border-bottom: 2px solid #d4af37;
+            transition: background-color 0.3s, padding 0.3s;
+        }
+        nav:hover {
+            background-color: rgba(0,0,0,0.9);
+            padding: 10px 0;
+            border-bottom: none;
         }
         .menu-toggle {
             display: none;
@@ -102,7 +122,10 @@
         }
         .nav-menu a {
             font-size: 1rem;
-            transition: color 0.3s;
+            transition: color 0.3s, text-shadow 0.3s;
+        }
+        .nav-menu a:hover {
+            text-shadow: 0 0 10px #d4af37;
         }
         @media (min-width: 769px) {
             .nav-menu {
@@ -113,15 +136,32 @@
             }
         }
         @media (max-width: 768px) {
+            nav {
+                background-color: rgba(0,0,0,0.9);
+                padding: 10px 0;
+                border-bottom: none;
+            }
             .menu-toggle {
                 display: block;
             }
             .nav-menu {
                 display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.9);
                 flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                z-index: 999;
             }
             .nav-menu li {
-                margin: 10px 0;
+                margin: 20px 0;
+            }
+            .nav-menu a {
+                font-size: 1.5rem;
             }
         }
         /* Sections */
@@ -163,7 +203,9 @@
             padding: 20px;
             text-align: center;
             border: 1px solid #d4af37;
+            border-radius: 8px;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
         }
         .info-card:hover {
             transform: scale(1.05);
@@ -171,9 +213,11 @@
         }
         .info-card img {
             width: 100%;
+            height: auto;
             max-height: 300px;
             object-fit: cover;
-            border-radius: 8px;
+            border-radius: 8px 8px 0 0;
+            transition: transform 0.3s ease;
         }
         .info-card h3 {
             font-size: 1.5rem;
@@ -196,6 +240,73 @@
         .btn:hover {
             background: #ffd700;
             transform: scale(1.05);
+        }
+        /* Section-Specific Styles */
+        #real-estate .info-card:hover img {
+            transform: scale(1.1);
+        }
+        #art .info-card img {
+            filter: sepia(0.2) brightness(1.1);
+        }
+        #music .info-card:hover {
+            background: linear-gradient(135deg, #111, #222);
+        }
+        #music .info-card:hover h3 {
+            color: #ffd700;
+        }
+        #crypto {
+            background: radial-gradient(circle, rgba(0,255,0,0.05) 0%, rgba(0,0,0,0) 70%);
+        }
+        #crypto .info-card:hover {
+            box-shadow: 0 0 20px rgba(0,255,0,0.5);
+        }
+        #coast-life .info-card:hover img {
+            filter: grayscale(0.5);
+        }
+        #our-vision {
+            background-image: url('https://via.placeholder.com/1920x1080?text=Faded+Coast+Horizon');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        #our-vision::before {
+            background: rgba(0,0,0,0.7);
+        }
+        #our-vision .vision {
+            font-size: 1.2rem;
+            max-width: 1000px;
+            padding: 20px;
+            background: rgba(17,17,17,0.8);
+            border: 1px solid #d4af37;
+            border-radius: 8px;
+        }
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .stat-card {
+            background: #111;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid #d4af37;
+            border-radius: 8px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(212,175,55,0.5);
+        }
+        .stat-card h3 {
+            font-size: 2rem;
+        }
+        .stat-card p {
+            font-size: 1rem;
+        }
+        .stat-card small {
+            font-size: 0.8rem;
+            color: #aaa;
         }
         /* Modals */
         .modal {
@@ -231,38 +342,12 @@
         .close:hover {
             color: #ffd700;
         }
-        /* Stats Grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }
-        .stat-card {
-            background: #111;
-            padding: 20px;
-            text-align: center;
-            border: 1px solid #d4af37;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .stat-card:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 20px rgba(212,175,55,0.5);
-        }
-        .stat-card h3 {
-            font-size: 2rem;
-        }
-        .stat-card p {
-            font-size: 1rem;
-        }
-        .stat-card small {
-            font-size: 0.8rem;
-            color: #aaa;
-        }
         /* Footer */
         footer {
             background: #111;
             padding: 20px;
             text-align: center;
+            border-top: 1px solid #d4af37;
         }
         footer a {
             margin: 0 10px;
@@ -270,6 +355,16 @@
         }
         footer a:hover {
             color: #ffd700;
+        }
+        @media (max-width: 768px) {
+            footer {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            footer a {
+                margin: 10px 0;
+            }
         }
         /* Animations */
         @keyframes fadeIn {
@@ -313,11 +408,10 @@
     <!-- Hero Section -->
     <section id="hero">
         <h1>Gulf Elite Hub</h1>
-        <p>Born and raised on the sun-kissed Mississippi Gulf Coast, we journeyed across the U.S., thriving in Los Angeles and other cities during our twenties, before returning to instill our enduring Southern soul in the next generation.
-
-In Hollywood, we built expertise through celebrity collaborations, influencer campaigns, and global network marketing, amassing elite connections in entertainment.
-
-Now back home, we enrich our community with luxurious, exhilarating experiences that spark joy and possibility. Harnessing our network, we spotlight the Coast's pristine beaches, opulent resorts, culinary delights, and cultural gems, elevating it to a premier U.S. metropolitan hub and world-class tourist destination—driving sustainable growth and an inspiring legacy.</p>
+        <p>Born and raised on the sun-kissed Mississippi Gulf Coast,<br>
+        we journeyed across the U.S., thriving in Los Angeles and other cities during our twenties,<br>
+        before returning to instill our enduring Southern soul in the next generation.<br>
+        Now back home, we enrich our community with luxurious, exhilarating experiences that sparkjoy and possibility.</p>
     </section>
 
     <!-- Navigation -->
@@ -330,6 +424,7 @@ Now back home, we enrich our community with luxurious, exhilarating experiences 
             <li><a href="#music">Music</a></li>
             <li><a href="#crypto">Crypto</a></li>
             <li><a href="#coast-life">Coast Life</a></li>
+            <li><a href="#food">Food</a></li>
             <li><a href="#our-vision">Our Coast Vision</a></li>
             <li><a href="#stats">MS Coast Statistics</a></li>
         </ul>
@@ -386,6 +481,34 @@ Now back home, we enrich our community with luxurious, exhilarating experiences 
                     <h3>Commercial Lot</h3>
                     <p>Price: $10M</p>
                     <div class="btn" onclick="openModal('real-estate-modal-3')">View Details</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Crypto Section -->
+    <section id="crypto">
+        <div class="container">
+            <h2>Crypto</h2>
+            <p class="vision">Our vision for crypto is to pioneer digital assets that empower the community and drive innovation in the Gulf Coast economy.</p>
+            <div class="info-grid">
+                <div class="info-card">
+                    <img src="https://via.placeholder.com/600x400?text=Gulf+Token" alt="Gulf Token" loading="lazy">
+                    <h3>Gulf Token</h3>
+                    <p>Value: 2 ETH</p>
+                    <div class="btn" onclick="openModal('crypto-modal-1')">Invest Now</div>
+                </div>
+                <div class="info-card">
+                    <img src="https://via.placeholder.com/600x400?text=Coast+NFT" alt="Coast NFT" loading="lazy">
+                    <h3>Coast NFT</h3>
+                    <p>Value: 1 ETH</p>
+                    <div class="btn" onclick="openModal('crypto-modal-2')">Invest Now</div>
+                </div>
+                <div class="info-card">
+                    <img src="https://via.placeholder.com/600x400?text=Elite+Coin" alt="Elite Coin" loading="lazy">
+                    <h3>Elite Coin</h3>
+                    <p>Value: 5 ETH</p>
+                    <div class="btn" onclick="openModal('crypto-modal-3')">Invest Now</div>
                 </div>
             </div>
         </div>
@@ -453,29 +576,29 @@ Now back home, we enrich our community with luxurious, exhilarating experiences 
         </div>
     </section>
 
-    <!-- Crypto Section -->
-    <section id="crypto">
+    <!-- Food Section -->
+    <section id="food">
         <div class="container">
-            <h2>Crypto</h2>
-            <p class="vision">Our vision for crypto is to pioneer digital assets that empower the community and drive innovation in the Gulf Coast economy.</p>
+            <h2>Food</h2>
+            <p class="vision">Our vision for food is to celebrate the Coast's culinary treasures through exquisite, locally-sourced experiences that tantalize the senses.</p>
             <div class="info-grid">
                 <div class="info-card">
-                    <img src="https://via.placeholder.com/600x400?text=Gulf+Token" alt="Gulf Token" loading="lazy">
-                    <h3>Gulf Token</h3>
-                    <p>Value: 2 ETH</p>
-                    <div class="btn" onclick="openModal('crypto-modal-1')">Invest Now</div>
+                    <img src="https://via.placeholder.com/600x400?text=Seafood+Feast" alt="Seafood Feast" loading="lazy">
+                    <h3>Seafood Feast</h3>
+                    <p>Fresh Gulf seafood extravaganza</p>
+                    <div class="btn" onclick="openModal('food-modal-1')">Reserve</div>
                 </div>
                 <div class="info-card">
-                    <img src="https://via.placeholder.com/600x400?text=Coast+NFT" alt="Coast NFT" loading="lazy">
-                    <h3>Coast NFT</h3>
-                    <p>Value: 1 ETH</p>
-                    <div class="btn" onclick="openModal('crypto-modal-2')">Invest Now</div>
+                    <img src="https://via.placeholder.com/600x400?text=Gourmet+Fusion" alt="Gourmet Fusion" loading="lazy">
+                    <h3>Gourmet Fusion</h3>
+                    <p>Southern meets global flavors</p>
+                    <div class="btn" onclick="openModal('food-modal-2')">Reserve</div>
                 </div>
                 <div class="info-card">
-                    <img src="https://via.placeholder.com/600x400?text=Elite+Coin" alt="Elite Coin" loading="lazy">
-                    <h3>Elite Coin</h3>
-                    <p>Value: 5 ETH</p>
-                    <div class="btn" onclick="openModal('crypto-modal-3')">Invest Now</div>
+                    <img src="https://via.placeholder.com/600x400?text=Wine+Tasting" alt="Wine Tasting" loading="lazy">
+                    <h3>Wine Tasting</h3>
+                    <p>Curated coastal pairings</p>
+                    <div class="btn" onclick="openModal('food-modal-3')">Reserve</div>
                 </div>
             </div>
         </div>
@@ -524,22 +647,22 @@ Now back home, we enrich our community with luxurious, exhilarating experiences 
             <p class="vision">These statistics illustrate the thriving growth and potential of the Mississippi Gulf Coast as a hub for tourism, investment, and living.</p>
             <div class="stats-grid">
                 <div class="stat-card">
-                    <h3>427,000</h3>
+                    <h3 data-target="427000">0</h3>
                     <p>Population (2024)</p>
                     <small>Source: FRED Economic Data</small>
                 </div>
                 <div class="stat-card">
-                    <h3>$2.2B</h3>
+                    <h3 data-target="2.2">0</h3>
                     <p>Tourism Revenue (2024)</p>
                     <small>Source: Coastal Mississippi</small>
                 </div>
                 <div class="stat-card">
-                    <h3>3,000+</h3>
+                    <h3 data-target="3000">0</h3>
                     <p>New Tourism Jobs (2024)</p>
                     <small>Source: Coastal Mississippi</small>
                 </div>
                 <div class="stat-card">
-                    <h3>$299,900</h3>
+                    <h3 data-target="299900">0</h3>
                     <p>Median Home Price (2025)</p>
                     <small>Source: Rocket Homes</small>
                 </div>
@@ -550,8 +673,8 @@ Now back home, we enrich our community with luxurious, exhilarating experiences 
     <!-- Footer -->
     <footer>
         <p>© 2025 Gulf Elite Hub. All rights reserved.</p>
-        <a href="#">Contact Us</a>
-        <a href="#">Investor Inquiry</a>
+        <a href="#">Contact</a>
+        <a href="#">Investor</a>
     </footer>
 
     <!-- Modals -->
@@ -603,6 +726,30 @@ Now back home, we enrich our community with luxurious, exhilarating experiences 
             <a href="#" class="btn">Acquire</a>
         </div>
     </div>
+    <div id="crypto-modal-1" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('crypto-modal-1')">×</span>
+            <h3>Gulf Token Details</h3>
+            <p>Blockchain: Ethereum, Utility: Exclusive access.</p>
+            <a href="#" class="btn">Invest</a>
+        </div>
+    </div>
+    <div id="crypto-modal-2" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('crypto-modal-2')">×</span>
+            <h3>Coast NFT Details</h3>
+            <p>Blockchain: Solana, Utility: Digital art ownership.</p>
+            <a href="#" class="btn">Invest</a>
+        </div>
+    </div>
+    <div id="crypto-modal-3" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('crypto-modal-3')">×</span>
+            <h3>Elite Coin Details</h3>
+            <p>Blockchain: Binance Smart Chain, Utility: Staking rewards.</p>
+            <a href="#" class="btn">Invest</a>
+        </div>
+    </div>
     <div id="art-modal-1" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal('art-modal-1')">×</span>
@@ -645,28 +792,28 @@ Now back home, we enrich our community with luxurious, exhilarating experiences 
             <p>Full bio: Energetic performers with hit albums.</p>
         </div>
     </div>
-    <div id="crypto-modal-1" class="modal">
+    <div id="food-modal-1" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="closeModal('crypto-modal-1')">×</span>
-            <h3>Gulf Token Details</h3>
-            <p>Blockchain: Ethereum, Utility: Exclusive access.</p>
-            <a href="#" class="btn">Invest</a>
+            <span class="close" onclick="closeModal('food-modal-1')">×</span>
+            <h3>Seafood Feast</h3>
+            <p>Experience fresh Gulf seafood in a luxurious setting.</p>
+            <a href="#" class="btn">Confirm Reservation</a>
         </div>
     </div>
-    <div id="crypto-modal-2" class="modal">
+    <div id="food-modal-2" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="closeModal('crypto-modal-2')">×</span>
-            <h3>Coast NFT Details</h3>
-            <p>Blockchain: Solana, Utility: Digital art ownership.</p>
-            <a href="#" class="btn">Invest</a>
+            <span class="close" onclick="closeModal('food-modal-2')">×</span>
+            <h3>Gourmet Fusion</h3>
+            <p>Blend of Southern and global cuisines for the discerning palate.</p>
+            <a href="#" class="btn">Confirm Reservation</a>
         </div>
     </div>
-    <div id="crypto-modal-3" class="modal">
+    <div id="food-modal-3" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="closeModal('crypto-modal-3')">×</span>
-            <h3>Elite Coin Details</h3>
-            <p>Blockchain: Binance Smart Chain, Utility: Staking rewards.</p>
-            <a href="#" class="btn">Invest</a>
+            <span class="close" onclick="closeModal('food-modal-3')">×</span>
+            <h3>Wine Tasting</h3>
+            <p>Curated selection of wines paired with coastal delights.</p>
+            <a href="#" class="btn">Confirm Reservation</a>
         </div>
     </div>
     <div id="coast-life-modal-1" class="modal">
@@ -721,6 +868,26 @@ Now back home, we enrich our community with luxurious, exhilarating experiences 
                     navMenu.style.display = 'none';
                 }
             });
+        });
+
+        // Stats Count Up Animation
+        const countUp = (element) => {
+            const target = parseFloat(element.getAttribute('data-target'));
+            let count = 0;
+            const increment = target / 200; // Adjust for speed
+            const updateCount = () => {
+                count += increment;
+                if (count < target) {
+                    element.innerText = target > 10 ? Math.ceil(count).toLocaleString() : count.toFixed(1) + 'B';
+                    setTimeout(updateCount, 10);
+                } else {
+                    element.innerText = target > 10 ? target.toLocaleString() : target + 'B';
+                }
+            };
+            updateCount();
+        };
+        document.querySelectorAll('.stat-card h3').forEach((stat) => {
+            countUp(stat);
         });
     </script>
 </body>
