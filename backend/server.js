@@ -17,15 +17,18 @@ const JWT_SECRET = process.env.JWT_SECRET || 'supersecret123';
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
 const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH || '$2b$10$clxwZ8D/2J2h0BFc3bvi0uOalzyz6ZhgfIOu9wZ940MG/PckmgBDC';
 
+
+// Ensure uploads directory exists on startup
+Const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadDir);
+}
+
 app.use(cors());
 app.use(bodyParser.json());
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(uploadsDir));
 app.use(express.static(path.join(__dirname, '../public')));
 
-// Ensure uploads directory exists
-if (!fs.existsSync('uploads')) {
-    fs.mkdirSync('uploads');
-}
 
 // JSON file storage
 const LISTINGS_FILE = path.join(__dirname, 'listings.json');
