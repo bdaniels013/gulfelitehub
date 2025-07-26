@@ -124,275 +124,256 @@
         <div id="loading" hidden>Loading...</div>
         <ul id="listings-list" aria-label="List of current listings"></ul>
     </div>
-    <script>
-        // Configuration
-        const API_BASE_URL = '/api'; // Update to production URL (e.g., Render) when deployed
+  <script>
+    const API_BASE_URL = '/api'; // Update to Render URL when deployed
 
-        // Initialize
-        let token = localStorage.getItem('token');
-        if (token) {
-            validateToken().then(isValid => {
-                if (isValid) showManagement();
-                else {
+    let token = localStorage.getItem('token');
+    if (token) {
+        validateToken().then(isValid => {
+            if (isValid) showManagement();
+            else {
+                localStorage.removeItem('token');
+                document.getElementById('login-form').removeAttribute('hidden');
+            }
+        }).catch(err => console.error('Token validation error:', err));
+    }
+
+    async function validateToken() {
+        try {
+            const res = await fetch(`${API_BASE_URL}/admin/listings`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            return res.ok;
+        } catch (error) {
+            console.error('Validation fetch failed:', error);
+            return false;
+        }
+    }
+
+    function login(event) {
+        event.preventDefault();
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value.trim();
+        if (!username || !password) {
+            alert('Please enter both username and password');
+            return;
+        }
+        console.log('Attempting login with:', username);
+        fetch(`${API_BASE_URL}/admin/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        })
+            .then(res => {
+                console.log('Login response status:', res.status);
+                if (!res.ok) return res.json().then(err => Promise.reject(err.message || `HTTP ${res.status}`));
+                return res.json();
+            })
+            .then(data => {
+                if (data.token) {
+                    console.log('Login successful, token:', data.token);
+                    localStorage.setItem('token', data.token);
+                    document.getElementById('login-form').reset();
+                    showManagement();
+                } else {
+                    throw new Error('No token received');
+                }
+            })
+            .catch(error => {
+                console.error('Login error:', error);
+                alert('Login failed: ' + (error.message || 'Unknown error'));
+            });
+    }
+
+    function showManagement() {
+        document.getElementById('login-form').setAttribute('hidden', '');
+        document.getElementById('management').removeAttribute('hidden');
+        loadListings();
+    }
+
+    function logout() {
+        localStorage.removeItem('token');
+        document.getElementById('management').setAttribute('hidden', '');
+        document.getElementById('login-form').removeAttribute('hidden');
+        document.getElementById('listing-form').reset();
+    }
+
+    function loadListings() {
+        const token = localStorage.getItem('token');
+        console.log('Loading listings with token:', token);
+        if (!token) {
+            alert('No token - please log in again');
+            document.getElementById('login-form').removeAttribute('hidden');
+            document.getElementById('management').setAttribute('hidden', '');
+            return;
+        }
+        document.getElementById('loading').removeAttribute('hidden');
+        fetch(`${API_BASE_URL}/admin/listings`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        })
+            .then(res => {
+                console.log('Load listings response status:', res.status);
+                if (!res.ok) return res.json().then(err => Promise.reject(err.message || `HTTP ${res.status}`));
+                return res.json();
+            })
+            .then(listings => {
+                const list = document.getElementById('listings-list');
+                list.innerHTML = '';
+                if (listings.length === 0) list.innerHTML = '<li>No listings available.</li>';
+                listings.forEach(l => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        ${l.title} (${l.section}) ${l.image ? `<img src="${API_BASE_URL}/uploads/${l.image}" alt="${l.title} preview" width="50">` : ''}
+                        <button type="button" onclick="editListing('${l.id}')">Edit</button>
+                        <button type="button" onclick="deleteListing('${l.id}')">Delete</button>
+                    `;
+                    list.appendChild(li);
+                });
+            })
+            .catch(error => {
+                console.error('Load listings failed:', error);
+                alert('Failed to load listings: ' + (error.message || 'Unknown error'));
+                if (error.message.includes('401')) {
                     localStorage.removeItem('token');
                     document.getElementById('login-form').removeAttribute('hidden');
+                    document.getElementById('management').setAttribute('hidden', '');
                 }
-            }).catch(err => console.error('Token validation error:', err));
-        }
-
-        // Validate Token
-        async function validateToken() {
-            try {
-                const res = await fetch(`${API_BASE_URL}/admin/listings`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                return res.ok;
-            } catch (error) {
-                console.error('Validation fetch failed:', error);
-                return false;
-            }
-        }
-
-        // Login Handler
-        function login(event) {
-            event.preventDefault();
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value.trim();
-            if (!username || !password) {
-                alert('Please enter both username and password');
-                return;
-            }
-            console.log('Attempting login with:', username);
-            fetch(`${https://gulf-elite-hub.onrender.com}/admin/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
             })
-                .then(res => {
-                    console.log('Login response status:', res.status);
-                    if (!res.ok) return res.json().then(err => Promise.reject(err.message || `HTTP ${res.status}`));
-                    return res.json();
-                })
-                .then(data => {
-                    if (data.token) {
-                        console.log('Login successful, token:', data.token);
-                        localStorage.setItem('token', data.token);
-                        document.getElementById('login-form').reset();
-                        showManagement();
-                    } else {
-                        throw new Error('No token received');
-                    }
-                })
-                .catch(error => {
-                    console.error('Login error:', error);
-                    alert('Login failed: ' + (error.message || 'Unknown error'));
-                });
-        }
+            .finally(() => document.getElementById('loading').setAttribute('hidden', ''));
+    }
 
-        // Show Management Interface
-        function showManagement() {
-            document.getElementById('login-form').setAttribute('hidden', '');
-            document.getElementById('management').removeAttribute('hidden');
-            loadListings();
-        }
-
-        // Logout Handler
-        function logout() {
-            localStorage.removeItem('token');
-            document.getElementById('management').setAttribute('hidden', '');
+    function saveListing(event) {
+        event.preventDefault();
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert('No token - please log in again');
             document.getElementById('login-form').removeAttribute('hidden');
-            document.getElementById('listing-form').reset();
+            document.getElementById('management').setAttribute('hidden', '');
+            return;
         }
+        const section = document.getElementById('section').value;
+        const title = document.getElementById('title').value.trim();
+        const description = document.getElementById('description').value.trim();
+        const priceOrValue = document.getElementById('priceOrValue').value.trim();
+        if (!section || !title || !description || !priceOrValue) {
+            alert('All fields (section, title, description, price/value) are required');
+            return;
+        }
+        const id = document.getElementById('id').value;
+        const formData = new FormData();
+        formData.append('section', section);
+        formData.append('title', title);
+        formData.append('description', description);
+        formData.append('priceOrValue', priceOrValue);
+        const imageFile = document.getElementById('image').files[0];
+        if (imageFile) formData.append('image', imageFile);
 
-        // Load Listings
-        function loadListings() {
-            const token = localStorage.getItem('token');
-            console.log('Loading listings with token:', token);
-            if (!token) {
-                alert('No token - please log in again');
-                document.getElementById('login-form').removeAttribute('hidden');
-                document.getElementById('management').setAttribute('hidden', '');
-                return;
-            }
-            document.getElementById('loading').removeAttribute('hidden');
-            fetch(`${API_BASE_URL}/admin/listings`, {
-                headers: { 'Authorization': `Bearer ${token}` }
+        document.getElementById('loading').removeAttribute('hidden');
+        fetch(id ? `${API_BASE_URL}/admin/listings/${id}` : `${API_BASE_URL}/admin/listings`, {
+            method: id ? 'PUT' : 'POST',
+            headers: { 'Authorization': `Bearer ${token}` },
+            body: formData
+        })
+            .then(res => {
+                if (!res.ok) return res.json().then(err => Promise.reject(err.message || `HTTP ${res.status}`));
+                return res.json();
             })
-                .then(res => {
-                    console.log('Load listings response status:', res.status);
-                    if (!res.ok) return res.json().then(err => Promise.reject(err.message || `HTTP ${res.status}`));
-                    return res.json();
-                })
-                .then(listings => {
-                    const list = document.getElementById('listings-list');
-                    list.innerHTML = '';
-                    if (listings.length === 0) list.innerHTML = '<li>No listings available.</li>';
-                    listings.forEach(l => {
-                        const li = document.createElement('li');
-                        li.innerHTML = `
-                            ${l.title} (${l.section}) ${l.image ? `<img src="${API_BASE_URL}/uploads/${l.image}" alt="${l.title} preview" width="50">` : ''}
-                            <button type="button" onclick="editListing('${l.id}')">Edit</button>
-                            <button type="button" onclick="deleteListing('${l.id}')">Delete</button>
-                        `;
-                        list.appendChild(li);
-                    });
-                })
-                .catch(error => {
-                    console.error('Load listings failed:', error);
-                    alert('Failed to load listings: ' + (error.message || 'Unknown error'));
-                    if (error.message.includes('401')) {
-                        localStorage.removeItem('token');
-                        document.getElementById('login-form').removeAttribute('hidden');
-                        document.getElementById('management').setAttribute('hidden', '');
-                    }
-                })
-                .finally(() => document.getElementById('loading').setAttribute('hidden', ''));
-        }
-
-        // Save Listing
-        function saveListing(event) {
-            event.preventDefault();
-            const token = localStorage.getItem('token');
-            console.log('Saving with token:', token);
-            if (!token) {
-                alert('No token - please log in again');
-                document.getElementById('login-form').removeAttribute('hidden');
-                document.getElementById('management').setAttribute('hidden', '');
-                return;
-            }
-            const section = document.getElementById('section').value;
-            const title = document.getElementById('title').value.trim();
-            const description = document.getElementById('description').value.trim();
-            const priceOrValue = document.getElementById('priceOrValue').value.trim();
-            if (!section || !title || !description || !priceOrValue) {
-                alert('All fields (section, title, description, price/value) are required');
-                return;
-            }
-            const id = document.getElementById('id').value;
-            const formData = new FormData();
-            formData.append('section', section);
-            formData.append('title', title);
-            formData.append('description', description);
-            formData.append('priceOrValue', priceOrValue);
-            const imageFile = document.getElementById('image').files[0];
-            if (imageFile) formData.append('image', imageFile);
-            console.log('Form data:', [...formData.entries()]);
-
-            document.getElementById('loading').removeAttribute('hidden');
-            fetch(id ? `${API_BASE_URL}/admin/listings/${id}` : `${API_BASE_URL}/admin/listings`, {
-                method: id ? 'PUT' : 'POST',
-                headers: { 'Authorization': `Bearer ${token}` },
-                body: formData
+            .then(data => {
+                loadListings();
+                document.getElementById('listing-form').reset();
+                document.getElementById('image-preview').setAttribute('hidden', '');
+                document.getElementById('id').value = '';
             })
-                .then(res => {
-                    console.log('Save response status:', res.status);
-                    if (!res.ok) return res.json().then(err => Promise.reject(err.message || `HTTP ${res.status}`));
-                    return res.json();
-                })
-                .then(data => {
-                    console.log('Listing saved:', data);
-                    loadListings();
-                    document.getElementById('listing-form').reset();
-                    document.getElementById('image-preview').setAttribute('hidden', '');
-                    document.getElementById('id').value = '';
-                })
-                .catch(error => {
-                    console.error('Save failed:', error);
-                    alert('Failed to save listing: ' + (error.message || 'Unknown error'));
-                    if (error.message.includes('401')) {
-                        localStorage.removeItem('token');
-                        document.getElementById('login-form').removeAttribute('hidden');
-                        document.getElementById('management').setAttribute('hidden', '');
-                    }
-                })
-                .finally(() => document.getElementById('loading').setAttribute('hidden', ''));
-        }
-
-        // Edit Listing
-        function editListing(id) {
-            const token = localStorage.getItem('token');
-            console.log('Editing listing with id:', id);
-            if (!token) {
-                alert('No token - please log in again');
-                document.getElementById('login-form').removeAttribute('hidden');
-                document.getElementById('management').setAttribute('hidden', '');
-                return;
-            }
-            document.getElementById('loading').removeAttribute('hidden');
-            fetch(`${API_BASE_URL}/admin/listings/${id}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
+            .catch(error => {
+                console.error('Save failed:', error);
+                alert('Failed to save listing: ' + (error.message || 'Unknown error'));
+                if (error.message.includes('401')) {
+                    localStorage.removeItem('token');
+                    document.getElementById('login-form').removeAttribute('hidden');
+                    document.getElementById('management').setAttribute('hidden', '');
+                }
             })
-                .then(res => {
-                    console.log('Edit response status:', res.status);
-                    if (!res.ok) return res.json().then(err => Promise.reject(err.message || `HTTP ${res.status}`));
-                    return res.json();
-                })
-                .then(l => {
-                    document.getElementById('id').value = l.id;
-                    document.getElementById('section').value = l.section;
-                    document.getElementById('title').value = l.title;
-                    document.getElementById('description').value = l.description;
-                    document.getElementById('priceOrValue').value = l.priceOrValue;
-                    document.getElementById('image-preview').setAttribute('hidden', ''); // Clear preview on edit
-                })
-                .catch(error => {
-                    console.error('Edit load failed:', error);
-                    alert('Failed to load listing: ' + (error.message || 'Unknown error'));
-                    if (error.message.includes('401')) {
-                        localStorage.removeItem('token');
-                        document.getElementById('login-form').removeAttribute('hidden');
-                        document.getElementById('management').setAttribute('hidden', '');
-                    }
-                })
-                .finally(() => document.getElementById('loading').setAttribute('hidden', ''));
-        }
+            .finally(() => document.getElementById('loading').setAttribute('hidden', ''));
+    }
 
-        // Delete Listing
-        function deleteListing(id) {
-            const token = localStorage.getItem('token');
-            console.log('Deleting listing with id:', id);
-            if (!token) {
-                alert('No token - please log in again');
-                document.getElementById('login-form').removeAttribute('hidden');
-                document.getElementById('management').setAttribute('hidden', '');
-                return;
-            }
-            if (!confirm('Are you sure you want to delete this listing?')) return;
-            document.getElementById('loading').removeAttribute('hidden');
-            fetch(`${API_BASE_URL}/admin/listings/${id}`, {
-                method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${token}` }
+    function editListing(id) {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert('No token - please log in again');
+            document.getElementById('login-form').removeAttribute('hidden');
+            document.getElementById('management').setAttribute('hidden', '');
+            return;
+        }
+        document.getElementById('loading').removeAttribute('hidden');
+        fetch(`${API_BASE_URL}/admin/listings/${id}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        })
+            .then(res => {
+                if (!res.ok) return res.json().then(err => Promise.reject(err.message || `HTTP ${res.status}`));
+                return res.json();
             })
-                .then(res => {
-                    console.log('Delete response status:', res.status);
-                    if (!res.ok) return res.json().then(err => Promise.reject(err.message || `HTTP ${res.status}`));
-                    return res.json();
-                })
-                .then(() => loadListings())
-                .catch(error => {
-                    console.error('Delete failed:', error);
-                    alert('Failed to delete listing: ' + (error.message || 'Unknown error'));
-                    if (error.message.includes('401')) {
-                        localStorage.removeItem('token');
-                        document.getElementById('login-form').removeAttribute('hidden');
-                        document.getElementById('management').setAttribute('hidden', '');
-                    }
-                })
-                .finally(() => document.getElementById('loading').setAttribute('hidden', ''));
-        }
+            .then(l => {
+                document.getElementById('id').value = l.id;
+                document.getElementById('section').value = l.section;
+                document.getElementById('title').value = l.title;
+                document.getElementById('description').value = l.description;
+                document.getElementById('priceOrValue').value = l.priceOrValue;
+                document.getElementById('image-preview').setAttribute('hidden', '');
+            })
+            .catch(error => {
+                console.error('Edit load failed:', error);
+                alert('Failed to load listing: ' + (error.message || 'Unknown error'));
+                if (error.message.includes('401')) {
+                    localStorage.removeItem('token');
+                    document.getElementById('login-form').removeAttribute('hidden');
+                    document.getElementById('management').setAttribute('hidden', '');
+                }
+            })
+            .finally(() => document.getElementById('loading').setAttribute('hidden', ''));
+    }
 
-        // Image Preview
-        function previewImage(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    document.getElementById('image-preview').src = e.target.result;
-                    document.getElementById('image-preview').removeAttribute('hidden');
-                };
-                reader.readAsDataURL(file);
-            }
+    function deleteListing(id) {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert('No token - please log in again');
+            document.getElementById('login-form').removeAttribute('hidden');
+            document.getElementById('management').setAttribute('hidden', '');
+            return;
         }
-    </script>
+        if (!confirm('Are you sure you want to delete this listing?')) return;
+        document.getElementById('loading').removeAttribute('hidden');
+        fetch(`${API_BASE_URL}/admin/listings/${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        })
+            .then(res => {
+                if (!res.ok) return res.json().then(err => Promise.reject(err.message || `HTTP ${res.status}`));
+                return res.json();
+            })
+            .then(() => loadListings())
+            .catch(error => {
+                console.error('Delete failed:', error);
+                alert('Failed to delete listing: ' + (error.message || 'Unknown error'));
+                if (error.message.includes('401')) {
+                    localStorage.removeItem('token');
+                    document.getElementById('login-form').removeAttribute('hidden');
+                    document.getElementById('management').setAttribute('hidden', '');
+                }
+            })
+            .finally(() => document.getElementById('loading').setAttribute('hidden', ''));
+    }
+
+    function previewImage(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                document.getElementById('image-preview').src = e.target.result;
+                document.getElementById('image-preview').removeAttribute('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+</script>
 </body>
 </html>
