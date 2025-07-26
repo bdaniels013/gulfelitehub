@@ -3,8 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Gulf Elite Hub: Luxury investments, art, music, and lifestyle on the Mississippi Gulf Coast.">
+    <meta name="keywords" content="Gulf Coast, luxury investments, real estate, art, music, crypto, food, coast life">
+    <meta property="og:title" content="Gulf Elite Hub">
+    <meta property="og:description" content="Elevating the Mississippi Gulf Coast with luxurious experiences and opportunities.">
+    <meta property="og:image" content="https://via.placeholder.com/1200x630?text=Gulf+Elite+Hub">
+    <meta property="og:url" content="https://bdaniels013.github.io/gulfelitehub/">
+    <meta name="twitter:card" content="summary_large_image">
     <title>Gulf Elite Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="icon" href="https://via.placeholder.com/32x32?text=GEH" type="image/png">
     <style>
         /* Global Styles */
         * {
@@ -20,6 +30,7 @@
             background-color: #000;
             color: #fff;
             line-height: 1.6;
+            overflow-x: hidden;
         }
         h1, h2, h3 {
             font-family: 'Playfair Display', serif;
@@ -30,6 +41,7 @@
         a {
             color: #d4af37;
             text-decoration: none;
+            transition: color 0.3s ease;
         }
         a:hover {
             color: #ffd700;
@@ -402,6 +414,18 @@
             pointer-events: none;
             z-index: -1;
         }
+        .modal form {
+            margin-top: 20px;
+        }
+        .modal input {
+            padding: 10px;
+            width: 100%;
+            margin-bottom: 10px;
+            border: 1px solid #d4af37;
+            border-radius: 4px;
+            background: #222;
+            color: #fff;
+        }
     </style>
 </head>
 <body>
@@ -435,9 +459,7 @@
         <div class="container">
             <h2>Business Listings</h2>
             <p class="vision">Our vision for business listings is to showcase elite opportunities that contribute to the economic vitality and luxurious lifestyle of the Mississippi Gulf Coast.</p>
-            <div class="info-grid">
-                <!-- Dynamic listings will be loaded here -->
-            </div>
+            <div class="info-grid"></div>
         </div>
     </section>
 
@@ -446,9 +468,7 @@
         <div class="container">
             <h2>Real Estate Investments</h2>
             <p class="vision">Our vision for real estate investments is to offer premium properties that enhance the luxury and sustainability of coastal living.</p>
-            <div class="info-grid">
-                <!-- Dynamic listings will be loaded here -->
-            </div>
+            <div class="info-grid"></div>
         </div>
     </section>
 
@@ -457,9 +477,7 @@
         <div class="container">
             <h2>Crypto</h2>
             <p class="vision">Our vision for crypto is to pioneer digital assets that empower the community and drive innovation in the Gulf Coast economy.</p>
-            <div class="info-grid">
-                <!-- Dynamic listings will be loaded here -->
-            </div>
+            <div class="info-grid"></div>
         </div>
     </section>
 
@@ -468,9 +486,7 @@
         <div class="container">
             <h2>Art</h2>
             <p class="vision">Our vision for art is to foster a vibrant scene that captures the beauty and culture of the Gulf Coast through innovative and inspiring works.</p>
-            <div class="info-grid">
-                <!-- Dynamic listings will be loaded here -->
-            </div>
+            <div class="info-grid"></div>
         </div>
     </section>
 
@@ -479,9 +495,7 @@
         <div class="container">
             <h2>Music</h2>
             <p class="vision">Our vision for music is to spotlight talented artists who embody the soulful spirit of the South, creating unforgettable experiences for all.</p>
-            <div class="info-grid">
-                <!-- Dynamic listings will be loaded here -->
-            </div>
+            <div class="info-grid"></div>
         </div>
     </section>
 
@@ -490,9 +504,7 @@
         <div class="container">
             <h2>Food</h2>
             <p class="vision">Our vision for food is to celebrate the Coast's culinary treasures through exquisite, locally-sourced experiences that tantalize the senses.</p>
-            <div class="info-grid">
-                <!-- Dynamic listings will be loaded here -->
-            </div>
+            <div class="info-grid"></div>
         </div>
     </section>
 
@@ -501,9 +513,7 @@
         <div class="container">
             <h2>Coast Life</h2>
             <p class="vision">Our vision for coast life is to curate exceptional experiences that highlight the luxury, adventure, and relaxation of living on the Mississippi Gulf Coast.</p>
-            <div class="info-grid">
-                <!-- Dynamic listings will be loaded here -->
-            </div>
+            <div class="info-grid"></div>
         </div>
     </section>
 
@@ -552,7 +562,6 @@
         <a href="#">Investor</a>
     </footer>
 
-    <!-- Scripts -->
     <script>
         // Modal Functions
         function openModal(id) {
@@ -586,16 +595,16 @@
             try {
                 console.log(`Fetching listings for ${section}`);
                 const res = await fetch(`/api/listings/${section}`);
-                if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
+                if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
                 const listings = await res.json();
-                console.log(`Fetched listings for ${section}:`, listings);
+                console.log(`Fetched ${listings.length} listings for ${section}:`, listings);
                 const grid = document.querySelector(`#${sectionId} .info-grid`);
                 grid.innerHTML = '';
                 listings.forEach(l => {
                     const card = document.createElement('div');
                     card.className = 'info-card';
                     card.innerHTML = `
-                        <img src="${l.imageUrl}" alt="${l.title}">
+                        <img src="${l.imageUrl || 'https://via.placeholder.com/600x400?text=No+Image'}" alt="${l.title}" loading="lazy">
                         <h3>${l.title}</h3>
                         <p>${l.priceOrValue}</p>
                         <div class="btn" onclick="openModal('${section}-modal-${l.id}')">
@@ -604,7 +613,7 @@
                         ${section === 'art' || section === 'music' ? `<a href="#" class="btn">${section === 'art' ? 'Buy Now' : 'Book Now'}</a>` : ''}
                     `;
                     grid.appendChild(card);
-                    // Create dynamic modal
+                    // Dynamic modal
                     const modal = document.createElement('div');
                     modal.id = `${section}-modal-${l.id}`;
                     modal.className = 'modal';
