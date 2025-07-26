@@ -1,5 +1,14 @@
-node_modules/
+# Node
+node_modules
+package-lock.json
+
+# Env
 .env
+backend/.env
+
+# Uploads
+backend/uploads/*
 uploads/*
-*.log
+
+# System
 .DS_Store
