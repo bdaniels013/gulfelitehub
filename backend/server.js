@@ -8,8 +8,8 @@ const bodyParser = require('body-parser');
 const nodemailer = require('nodemailer');
 const path = require('path');
 const fs = require('fs');
-const { v4: uuidv4 } = require('uuid'); // Added for unique IDs
-const { body, validationResult } = require('express-validator'); // Added for input validation
+const { v4: uuidv4 } = require('uuid');
+const { body, validationResult } = require('express-validator');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -17,18 +17,17 @@ const JWT_SECRET = process.env.JWT_SECRET || 'supersecret123';
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
 const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH || '$2b$10$clxwZ8D/2J2h0BFc3bvi0uOalzyz6ZhgfIOu9wZ940MG/PckmgBDC';
 
-
-// Ensure uploads directory exists on startup
-Const uploadsDir = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadDir);
-}
-
 app.use(cors());
 app.use(bodyParser.json());
+
+// Ensure uploads directory exists
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
 app.use('/uploads', express.static(uploadsDir));
 app.use(express.static(path.join(__dirname, '../public')));
-
 
 // JSON file storage
 const LISTINGS_FILE = path.join(__dirname, 'listings.json');
