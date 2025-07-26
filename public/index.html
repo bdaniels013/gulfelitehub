@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gulf Elite Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #000;
+            color: #fff;
+            line-height: 1.6;
+        }
+        h1, h2, h3 {
+            font-family: 'Playfair Display', serif;
+            color: #d4af37;
+            text-transform: uppercase;
+            text-align: center;
+        }
+        a {
+            color: #d4af37;
+            text-decoration: none;
+        }
+        a:hover {
+            color: #ffd700;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        /* Hero Section */
+        #hero {
+            height: 100vh;
+            background-image: url('https://via.placeholder.com/1920x1080?text=Luxury+Coastal+Sunset');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+        }
+        #hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.6));
+        }
+        #hero h1 {
+            font-size: 4rem;
+            z-index: 1;
+            margin-bottom: 20px;
+            animation: fadeIn 2s ease-in;
+        }
+        #hero p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            z-index: 1;
+            animation: fadeIn 2s ease-in 0.5s forwards;
+            opacity: 0;
+        }
+        @media (max-width: 768px) {
+            #hero h1 {
+                font-size: 3rem;
+            }
+            #hero p {
+                font-size: 1rem;
+                padding: 0 20px;
+            }
+        }
+        /* Navigation */
+        nav {
+            position: sticky;
+            top: 0;
+            background-color: transparent;
+            z-index: 1000;
+            padding: 0;
+            text-align: center;
+            border-bottom: 2px solid #d4af37;
+            transition: background-color 0.3s, padding 0.3s;
+        }
+        nav:hover {
+            background-color: rgba(0,0,0,0.9);
+            padding: 10px 0;
+            border-bottom: none;
+        }
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: #d4af37;
+            font-size: 2rem;
+            cursor: pointer;
+            margin: 0 auto;
+        }
+        .nav-menu {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 0;
+            padding: 0;
+        }
+        .nav-menu li {
+            margin: 0 15px;
+        }
+        .nav-menu a {
+            font-size: 1rem;
+            transition: color 0.3s, text-shadow 0.3s;
+        }
+        .nav-menu a:hover {
+            text-shadow: 0 0 10px #d4af37;
+        }
+        @media (min-width: 769px) {
+            .nav-menu {
+                display: none;
+            }
+            nav:hover .nav-menu {
+                display: flex;
+            }
+        }
+        @media (max-width: 768px) {
+            nav {
+                background-color: rgba(0,0,0,0.9);
+                padding: 10px 0;
+                border-bottom: none;
+            }
+            .menu-toggle {
+                display: block;
+            }
+            .nav-menu {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.9);
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                z-index: 999;
+            }
+            .nav-menu li {
+                margin: 20px 0;
+            }
+            .nav-menu a {
+                font-size: 1.5rem;
+            }
+        }
+        /* Sections */
+        section {
+            padding: 60px 0;
+            position: relative;
+        }
+        section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0) 70%);
+            pointer-events: none;
+            z-index: -1;
+        }
+        section h2 {
+            font-size: 3rem;
+            margin-bottom: 40px;
+            text-shadow: 0 0 10px rgba(212,175,55,0.3);
+        }
+        section .vision {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto 40px;
+            font-style: italic;
+            color: #ccc;
+        }
+        /* Info Grid Styles */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .info-card {
+            background: #111;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid #d4af37;
+            border-radius: 8px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+        }
+        .info-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(212,175,55,0.5);
+        }
+        .info-card img {
+            width: 100%;
+            height: auto;
+            max-height: 300px;
+            object-fit: cover;
+            border-radius: 8px 8px 0 0;
+            transition: transform 0.3s ease;
+        }
+        .info-card h3 {
+            font-size: 1.5rem;
+            margin: 10px 0;
+        }
+        .info-card p {
+            font-size: 1rem;
+        }
+        .btn {
+            display: inline-block;
+            background: #d4af37;
+            color: #000;
+            padding: 12px 24px;
+            margin: 10px 5px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.3s;
+            font-size: 1rem;
+            border-radius: 4px;
+        }
+        .btn:hover {
+            background: #ffd700;
+            transform: scale(1.05);
+        }
+        /* Section-Specific Styles */
+        #real-estate .info-card:hover img {
+            transform: scale(1.1);
+        }
+        #art .info-card img {
+            filter: sepia(0.2) brightness(1.1);
+        }
+        #music .info-card:hover {
+            background: linear-gradient(135deg, #111, #222);
+        }
+        #music .info-card:hover h3 {
+            color: #ffd700;
+        }
+        #crypto {
+            background: radial-gradient(circle, rgba(0,255,0,0.05) 0%, rgba(0,0,0,0) 70%);
+        }
+        #crypto .info-card:hover {
+            box-shadow: 0 0 20px rgba(0,255,0,0.5);
+        }
+        #coast-life .info-card:hover img {
+            filter: grayscale(0.5);
+        }
+        #our-vision {
+            background-image: url('https://via.placeholder.com/1920x1080?text=Faded+Coast+Horizon');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        #our-vision::before {
+            background: rgba(0,0,0,0.7);
+        }
+        #our-vision .vision {
+            font-size: 1.2rem;
+            max-width: 1000px;
+            padding: 20px;
+            background: rgba(17,17,17,0.8);
+            border: 1px solid #d4af37;
+            border-radius: 8px;
+        }
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .stat-card {
+            background: #111;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid #d4af37;
+            border-radius: 8px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(212,175,55,0.5);
+        }
+        .stat-card h3 {
+            font-size: 2rem;
+        }
+        .stat-card p {
+            font-size: 1rem;
+        }
+        .stat-card small {
+            font-size: 0.8rem;
+            color: #aaa;
+        }
+        /* Modals */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+        .modal-content {
+            background: #111;
+            padding: 30px;
+            max-width: 600px;
+            text-align: center;
+            border: 1px solid #d4af37;
+            border-radius: 8px;
+            box-shadow: 0 0 30px rgba(212,175,55,0.3);
+        }
+        .close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #d4af37;
+            transition: color 0.3s;
+        }
+        .close:hover {
+            color: #ffd700;
+        }
+        /* Footer */
+        footer {
+            background: #111;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #d4af37;
+        }
+        footer a {
+            margin: 0 10px;
+            transition: color 0.3s;
+        }
+        footer a:hover {
+            color: #ffd700;
+        }
+        @media (max-width: 768px) {
+            footer {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            footer a {
+                margin: 10px 0;
+            }
+        }
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        section {
+            animation: fadeIn 1s ease-in;
+        }
+        .info-card, .stat-card {
+            animation: fadeIn 1s ease-in forwards;
+            opacity: 0;
+        }
+        .info-grid .info-card:nth-child(1), .stats-grid .stat-card:nth-child(1) {
+            animation-delay: 0.2s;
+        }
+        .info-grid .info-card:nth-child(2), .stats-grid .stat-card:nth-child(2) {
+            animation-delay: 0.4s;
+        }
+        .info-grid .info-card:nth-child(3), .stats-grid .stat-card:nth-child(3) {
+            animation-delay: 0.6s;
+        }
+        .stats-grid .stat-card:nth-child(4) {
+            animation-delay: 0.8s;
+        }
+        /* Gradient and Sparkle Effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(212,175,55,0.1) 0%, rgba(0,0,0,0) 70%);
+            pointer-events: none;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section id="hero">
+        <h1>Gulf Elite Hub</h1>
+        <p>Born and raised on the sun-kissed Mississippi Gulf Coast,<br>
+        we journeyed across the U.S., thriving in Los Angeles and other cities during our twenties,<br>
+        before returning to instill our enduring Southern soul in the next generation.<br>
+        Now back home, we enrich our community with luxurious, exhilarating experiences that spark joy and possibility.</p>
+    </section>
+
+    <!-- Navigation -->
+    <nav>
+        <button class="menu-toggle">☰</button>
+        <ul class="nav-menu">
+            <li><a href="#business-listings">Business Listings</a></li>
+            <li><a href="#real-estate">Real Estate Investments</a></li>
+            <li><a href="#art">Art</a></li>
+            <li><a href="#music">Music</a></li>
+            <li><a href="#crypto">Crypto</a></li>
+            <li><a href="#coast-life">Coast Life</a></li>
+            <li><a href="#food">Food</a></li>
+            <li><a href="#our-vision">Our Coast Vision</a></li>
+            <li><a href="#stats">MS Coast Statistics</a></li>
+        </ul>
+    </nav>
+
+    <!-- Business Listings Section -->
+    <section id="business-listings">
+        <div class="container">
+            <h2>Business Listings</h2>
+            <p class="vision">Our vision for business listings is to showcase elite opportunities that contribute to the economic vitality and luxurious lifestyle of the Mississippi Gulf Coast.</p>
+            <div class="info-grid">
+                <!-- Dynamic listings will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Real Estate Investments Section -->
+    <section id="real-estate">
+        <div class="container">
+            <h2>Real Estate Investments</h2>
+            <p class="vision">Our vision for real estate investments is to offer premium properties that enhance the luxury and sustainability of coastal living.</p>
+            <div class="info-grid">
+                <!-- Dynamic listings will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Crypto Section -->
+    <section id="crypto">
+        <div class="container">
+            <h2>Crypto</h2>
+            <p class="vision">Our vision for crypto is to pioneer digital assets that empower the community and drive innovation in the Gulf Coast economy.</p>
+            <div class="info-grid">
+                <!-- Dynamic listings will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Art Section -->
+    <section id="art">
+        <div class="container">
+            <h2>Art</h2>
+            <p class="vision">Our vision for art is to foster a vibrant scene that captures the beauty and culture of the Gulf Coast through innovative and inspiring works.</p>
+            <div class="info-grid">
+                <!-- Dynamic listings will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Music Section -->
+    <section id="music">
+        <div class="container">
+            <h2>Music</h2>
+            <p class="vision">Our vision for music is to spotlight talented artists who embody the soulful spirit of the South, creating unforgettable experiences for all.</p>
+            <div class="info-grid">
+                <!-- Dynamic listings will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Food Section -->
+    <section id="food">
+        <div class="container">
+            <h2>Food</h2>
+            <p class="vision">Our vision for food is to celebrate the Coast's culinary treasures through exquisite, locally-sourced experiences that tantalize the senses.</p>
+            <div class="info-grid">
+                <!-- Dynamic listings will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Coast Life Section -->
+    <section id="coast-life">
+        <div class="container">
+            <h2>Coast Life</h2>
+            <p class="vision">Our vision for coast life is to curate exceptional experiences that highlight the luxury, adventure, and relaxation of living on the Mississippi Gulf Coast.</p>
+            <div class="info-grid">
+                <!-- Dynamic listings will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Our Coast Vision Section -->
+    <section id="our-vision">
+        <div class="container">
+            <h2>Our Coast Vision</h2>
+            <p class="vision">Building upon our roots and global networks, we envision elevating the Mississippi Gulf Coast to a premier destination for luxury, innovation, and growth. By leveraging Hollywood connections and influencer partnerships, we aim to spotlight our unique southern soul, fostering economic expansion and cultural enrichment for generations to come.</p>
+        </div>
+    </section>
+
+    <!-- MS Coast Statistics Section -->
+    <section id="stats">
+        <div class="container">
+            <h2>MS Coast Statistics</h2>
+            <p class="vision">These statistics illustrate the thriving growth and potential of the Mississippi Gulf Coast as a hub for tourism, investment, and living.</p>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3 data-target="427000">0</h3>
+                    <p>Population (2024)</p>
+                    <small>Source: FRED Economic Data</small>
+                </div>
+                <div class="stat-card">
+                    <h3 data-target="2.2">0</h3>
+                    <p>Tourism Revenue (2024)</p>
+                    <small>Source: Coastal Mississippi</small>
+                </div>
+                <div class="stat-card">
+                    <h3 data-target="3000">0</h3>
+                    <p>New Tourism Jobs (2024)</p>
+                    <small>Source: Coastal Mississippi</small>
+                </div>
+                <div class="stat-card">
+                    <h3 data-target="299900">0</h3>
+                    <p>Median Home Price (2025)</p>
+                    <small>Source: Rocket Homes</small>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>© 2025 Gulf Elite Hub. All rights reserved.</p>
+        <a href="#">Contact</a>
+        <a href="#">Investor</a>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // Modal Functions
+        function openModal(id) {
+            document.getElementById(id).style.display = 'flex';
+        }
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+
+        // Menu Toggle
+        const menuToggle = document.querySelector('.menu-toggle');
+        const navMenu = document.querySelector('.nav-menu');
+        menuToggle.addEventListener('click', () => {
+            navMenu.style.display = navMenu.style.display === 'flex' ? 'none' : 'flex';
+        });
+        document.querySelectorAll('.nav-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    navMenu.style.display = 'none';
+                }
+            });
+        });
+
+        // Dynamic Listings
+        async function loadSection(sectionId, section) {
+            try {
+                console.log(`Fetching listings for ${section}`);
+                const res = await fetch(`/api/listings/${section}`);
+                if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
+                const listings = await res.json();
+                console.log(`Fetched listings for ${section}:`, listings);
+                const grid = document.querySelector(`#${sectionId} .info-grid`);
+                grid.innerHTML = '';
+                listings.forEach(l => {
+                    const card = document.createElement('div');
+                    card.className = 'info-card';
+                    card.innerHTML = `
+                        <img src="${l.imageUrl}" alt="${l.title}">
+                        <h3>${l.title}</h3>
+                        <p>${l.priceOrValue}</p>
+                        <div class="btn" onclick="openModal('${section}-modal-${l.id}')">
+                            ${section === 'food' ? 'Reserve' : section === 'art' ? 'Details' : section === 'music' ? 'Bio & More' : 'Explore More'}
+                        </div>
+                        ${section === 'art' || section === 'music' ? `<a href="#" class="btn">${section === 'art' ? 'Buy Now' : 'Book Now'}</a>` : ''}
+                    `;
+                    grid.appendChild(card);
+                    // Create dynamic modal
+                    const modal = document.createElement('div');
+                    modal.id = `${section}-modal-${l.id}`;
+                    modal.className = 'modal';
+                    modal.innerHTML = `
+                        <div class="modal-content">
+                            <span class="close" onclick="closeModal('${section}-modal-${l.id}')">×</span>
+                            <h3>${l.title}</h3>
+                            <p>${l.description}</p>
+                            <form onsubmit="submitInquiry(event, '${l.title}')">
+                                <input type="email" placeholder="Your Email" required>
+                                <button type="submit" class="btn">Send Inquiry</button>
+                            </form>
+                        </div>
+                    `;
+                    document.body.appendChild(modal);
+                });
+            } catch (err) {
+                console.error(`Error loading ${section}:`, err);
+            }
+        }
+
+        // Load all sections on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSection('business-listings', 'business');
+            loadSection('real-estate', 'real-estate');
+            loadSection('crypto', 'crypto');
+            loadSection('art', 'art');
+            loadSection('music', 'music');
+            loadSection('food', 'food');
+            loadSection('coast-life', 'coast-life');
+        });
+
+        // Inquiry Form Submission
+        function submitInquiry(event, listingTitle) {
+            event.preventDefault();
+            const email = event.target.querySelector('input[type="email"]').value;
+            fetch('/api/inquiry', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ listingTitle, email })
+            })
+                .then(res => res.json())
+                .then(data => alert(data.message))
+                .catch(err => alert('Inquiry error: ' + err.message));
+        }
+
+        // Stats Count Up Animation
+        const countUp = (element) => {
+            const target = parseFloat(element.getAttribute('data-target'));
+            let count = 0;
+            const increment = target / 200;
+            const updateCount = () => {
+                count += increment;
+                if (count < target) {
+                    element.innerText = target > 10 ? Math.ceil(count).toLocaleString() : count.toFixed(1) + 'B';
+                    setTimeout(updateCount, 10);
+                } else {
+                    element.innerText = target > 10 ? target.toLocaleString() : target + 'B';
+                }
+            };
+            updateCount();
+        };
+        document.querySelectorAll('.stat-card h3').forEach(stat => countUp(stat));
+    </script>
+</body>
+</html>

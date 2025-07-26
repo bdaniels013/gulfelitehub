@@ -1,0 +1,249 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <style>
+        body { font-family: 'Montserrat', sans-serif; background: #000; color: #fff; padding: 20px; }
+        h1, h2 { font-family: 'Playfair Display', serif; color: #d4af37; text-align: center; }
+        form { max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; }
+        input, select, button { padding: 10px; font-size: 1rem; border: 1px solid #d4af37; border-radius: 4px; }
+        button { background: #d4af37; color: #000; cursor: pointer; }
+        button:hover { background: #ffd700; }
+        #listings-list { max-width: 600px; margin: 20px auto; }
+        #listings-list li { margin: 10px 0; display: flex; gap: 10px; }
+        #listings-list button { padding: 5px 10px; }
+    </style>
+</head>
+<body>
+    <h1>Admin Dashboard</h1>
+    <form id="login-form" style="display: block;" onsubmit="login(event)">
+        <input type="text" id="username" placeholder="Username" required>
+        <input type="password" id="password" placeholder="Password" required>
+        <button type="submit">Login</button>
+    </form>
+    <div id="management" style="display: none;">
+        <h2>Add/Edit Listing</h2>
+        <form id="listing-form" onsubmit="saveListing(event)">
+            <input type="text" id="id" placeholder="ID (for edit)" hidden>
+            <select id="section" required>
+                <option value="business">Business</option>
+                <option value="real-estate">Real Estate</option>
+                <option value="crypto">Crypto</option>
+                <option value="art">Art</option>
+                <option value="music">Music</option>
+                <option value="food">Food</option>
+                <option value="coast-life">Coast Life</option>
+            </select>
+            <input type="text" id="title" placeholder="Title" required>
+            <input type="text" id="description" placeholder="Description" required>
+            <input type="text" id="priceOrValue" placeholder="Price/Value" required>
+            <input type="file" id="image" accept="image/*">
+            <button type="submit">Save</button>
+        </form>
+        <h2>Current Listings</h2>
+        <ul id="listings-list"></ul>
+    </div>
+    <script>
+        let token = localStorage.getItem('token');
+        if (token) showManagement();
+
+        function login(event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            console.log('Attempting login with:', username);
+            fetch('/api/admin/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            })
+                .then(res => {
+                    console.log('Login response status:', res.status);
+                    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+                    return res.json();
+                })
+                .then(data => {
+                    if (data.token) {
+                        console.log('Login successful, token:', data.token);
+                        localStorage.setItem('token', data.token);
+                        document.getElementById('login-form').reset();
+                        showManagement();
+                    } else {
+                        console.error('Login failed:', data.message);
+                        alert('Login failed: ' + data.message);
+                    }
+                })
+                .catch(err => {
+                    console.error('Login error:', err);
+                    alert('Login error: ' + err.message);
+                });
+        }
+
+        function showManagement() {
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('management').style.display = 'block';
+            loadListings();
+        }
+
+        function loadListings() {
+            const token = localStorage.getItem('token');
+            console.log('Loading listings with token:', token);
+            if (!token) {
+                alert('No token - please log in again');
+                return;
+            }
+            fetch('/api/admin/listings', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+                .then(res => {
+                    console.log('Load listings response status:', res.status);
+                    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+                    return res.json();
+                })
+                .then(listings => {
+                    const list = document.getElementById('listings-list');
+                    list.innerHTML = '';
+                    listings.forEach(l => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `${l.title} (${l.section}) <button onclick="editListing('${l.id}')">Edit</button> <button onclick="deleteListing('${l.id}')">Delete</button>`;
+                        list.appendChild(li);
+                    });
+                })
+                .catch(err => {
+                    console.error('Load listings error:', err);
+                    alert('Failed to load listings: ' + err.message);
+                });
+        }
+
+        function saveListing(event) {
+            event.preventDefault();
+            const token = localStorage.getItem('token');
+            console.log('Saving with token:', token);
+            if (!token) {
+                alert('No token - please log in again');
+                return;
+            }
+            const id = document.getElementById('id').value;
+            const formData = new FormData();
+            formData.append('section', document.getElementById('section').value);
+            formData.append('title', document.getElementById('title').value);
+            formData.append('description', document.getElementById('description').value);
+            formData.append('priceOrValue', document.getElementById('priceOrValue').value);
+            const imageFile = document.getElementById('image').files[0];
+            if (imageFile) formData.append('image', imageFile);
+            console.log('Form data:', [...formData.entries()]);
+
+            fetch(id ? `/api/admin/listings/${id}` : '/api/admin/listings', {
+                method: id ? 'PUT' : 'POST',
+                headers: { 'Authorization': `Bearer ${token}` },
+                body: formData
+            })
+                .then(res => {
+                    console.log('Save response status:', res.status);
+                    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+                    return res.json();
+                })
+                .then(data => {
+                    console.log('Listing saved:', data);
+                    loadListings();
+                    document.getElementById('listing-form').reset();
+                })
+                .catch(err => {
+                    console.error('Save failed:', err);
+                    alert('Save failed: ' + err.message);
+                });
+        }
+
+        function editListing(id) {
+            const token = localStorage.getItem('token');
+            console.log('Editing listing with id:', id, 'token:', token);
+            if (!token) {
+                alert('No token - please log in again');
+                return;
+            }
+            fetch(`/api/admin/listings/${id}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+                .then(res => {
+                    console.log('Edit response status:', res.status);
+                    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+                    return res.json();
+                })
+                .then(l => {
+                    document.getElementById('id').value = l.id;
+                    document.getElementById('section').value = l.section;
+                    document.getElementById('title').value = l.title;
+                    document.getElementById('description').value = l.description;
+                    document.getElementById('priceOrValue').value = l.priceOrValue;
+                })
+                .catch(err => {
+                    console.error('Edit load failed:', err);
+                    alert('Failed to load listing: ' + err.message);
+                });
+        }
+
+        function deleteListing(id) {
+            const token = localStorage.getItem('token');
+            console.log('Deleting listing with id:', id, 'token:', token);
+            if (!token) {
+                alert('No token - please log in again');
+                return;
+            }
+            fetch(`/api/admin/listings/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+                .then(res => {
+                    console.log('Delete response status:', res.status);
+                    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+                    return res.json();
+                })
+                .then(() => loadListings())
+                .catch(err => {
+                    console.error('Delete failed:', err);
+                    alert('Delete failed: ' + err.message);
+                });
+        }
+    </script>
+</body>
+</html>
