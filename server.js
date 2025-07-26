@@ -13,8 +13,8 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecret123';
 const ADMIN_USERNAME = 'admin';
-const ADMIN_PASSWORD_HASH = '$2b$10$H0XYgFZuLhE/drO0S3vSVupID5VP5EakmtpmFxIu20znlXQRkXmcS'; // Update with your actual hash
-
+const ADMIN_PASSWORD_HASH = 
+'$2b$10$clxwZ8D/2J2h0BFc3bvi0uOalzyz6ZhgfIOu9wZ940MG/PckmgBDC';
 app.use(cors());
 app.use(bodyParser.json());
 app.use('/uploads', express.static('uploads'));
